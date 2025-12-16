@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Code, LogOut } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import ClerkUserButton from './ClerkUserButton';
 
 interface NavLink {
     href: string;
@@ -37,13 +38,16 @@ export default function MobileNav({ username, navLinks }: MobileNavProps) {
                         <Code className="w-6 h-6 text-green-400" />
                         <span className="text-lg font-bold font-mono text-green-400">DevTree</span>
                     </div>
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="p-2 text-slate-300 hover:text-green-400 transition-colors"
-                        aria-label="Toggle menu"
-                    >
-                        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <ClerkUserButton />
+                        <button
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="p-2 text-slate-300 hover:text-green-400 transition-colors"
+                            aria-label="Toggle menu"
+                        >
+                            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        </button>
+                    </div>
                 </div>
             </div>
 

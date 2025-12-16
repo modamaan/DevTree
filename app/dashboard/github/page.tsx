@@ -4,6 +4,10 @@ import { getUserProfileByClerkId } from '@/lib/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Github, AlertCircle } from 'lucide-react';
+import { clerkClient } from '@clerk/nextjs/server';
+import GitHubConnectButton from '@/components/dashboard/GitHubConnectButton';
+import RepoManager from '@/components/dashboard/RepoManager';
+import { db } from '@/db';
 
 export default async function GitHubPage() {
     const { userId } = await auth();
@@ -20,6 +24,38 @@ export default async function GitHubPage() {
 
     const { profile } = userProfile;
 
+    // Check if user has connected GitHub via Clerk
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    const githubAccount = clerkUser.externalAccounts.find(
+        (account: any) => account.provider === 'oauth_github'
+    );
+    const isGitHubConnected = !!githubAccount;
+    const githubUsername = githubAccount?.username || profile.githubUsername;
+
+    // Debug: Log connection status (remove after testing)
+    console.log('GitHub Connection Status:', {
+        isGitHubConnected,
+        githubUsername,
+        hasGithubAccount: !!githubAccount,
+        externalAccountsCount: clerkUser.externalAccounts.length,
+        allAccounts: clerkUser.externalAccounts.map((acc: any) => ({
+            provider: acc.provider,
+            username: acc.username,
+            verification: acc.verification?.status
+        }))
+    });
+
+    // Fetch user's GitHub repositories from database
+    const dbUser = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.clerkId, userId),
+    });
+
+    const userRepos = isGitHubConnected && dbUser ? await db.query.githubRepos.findMany({
+        where: (repos, { eq }) => eq(repos.userId, dbUser.id),
+        orderBy: (repos, { desc }) => [desc(repos.stars)],
+    }) : [];
+
     return (
         <div>
             <div className="mb-8">
@@ -34,17 +70,17 @@ export default async function GitHubPage() {
                         GitHub Connection
                     </CardTitle>
                     <CardDescription className="text-slate-400">
-                        {profile.githubConnected
+                        {isGitHubConnected
                             ? 'Your GitHub account is connected'
                             : 'Connect your GitHub account to display your repositories'}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {profile.githubConnected ? (
+                    {isGitHubConnected ? (
                         <div className="space-y-4">
                             <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg">
                                 <p className="text-green-400 font-mono">
-                                    ✓ Connected as @{profile.githubUsername}
+                                    ✓ Connected as @{githubUsername}
                                 </p>
                             </div>
 
@@ -87,19 +123,22 @@ export default async function GitHubPage() {
                                 </ol>
                             </div>
 
-                            <Button
-                                disabled
-                                className="bg-slate-700 text-slate-400 cursor-not-allowed"
-                            >
-                                <Github className="w-4 h-4 mr-2" />
-                                Connect GitHub (Setup Required)
-                            </Button>
+                            <div className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+                                <p className="text-yellow-400 text-sm font-mono mb-2">
+                                    ⚠️ After completing setup above:
+                                </p>
+                                <ol className="text-sm text-yellow-300 space-y-1 list-decimal list-inside">
+                                    <li>Click your profile avatar (top right)</li>
+                                    <li>Select "Connected accounts"</li>
+                                    <li>Click "Connect" next to GitHub</li>
+                                </ol>
+                            </div>
                         </div>
                     )}
                 </CardContent>
             </Card>
 
-            {profile.githubConnected && (
+            {isGitHubConnected && (
                 <Card className="bg-slate-800/50 border-slate-700 mt-6">
                     <CardHeader>
                         <CardTitle className="text-green-400 font-mono">Repository Management</CardTitle>
@@ -108,9 +147,7 @@ export default async function GitHubPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-slate-400 text-center py-8">
-                            Repository management will be available once GitHub OAuth is fully configured.
-                        </p>
+                        <RepoManager repos={userRepos} />
                     </CardContent>
                 </Card>
             )}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Link as LinkIcon, FolderGit2, Code, FileText, Github, BarChart3, User } from 'lucide-react';
 import MobileNav from '@/components/dashboard/MobileNav';
 import LogoutButton from '@/components/dashboard/LogoutButton';
+import ClerkUserButton from '@/components/dashboard/ClerkUserButton';
 
 export default async function DashboardLayout({
     children,
@@ -45,8 +46,13 @@ export default async function DashboardLayout({
                 {/* Desktop Sidebar - Hidden on mobile */}
                 <aside className="hidden md:block w-64 min-h-screen border-r border-slate-700 bg-slate-900/50 backdrop-blur-sm p-6">
                     <div className="mb-8">
-                        <h2 className="text-2xl font-bold font-mono text-green-400 mb-2">DevTree</h2>
-                        <p className="text-sm text-slate-400 font-mono">@{profile.username}</p>
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 className="text-2xl font-bold font-mono text-green-400 mb-2">DevTree</h2>
+                                <p className="text-sm text-slate-400 font-mono">@{profile.username}</p>
+                            </div>
+                            <ClerkUserButton />
+                        </div>
                     </div>
 
                     <nav className="space-y-2">
