@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { updateProfile } from '@/app/actions/profile';
-import { Loader2 } from 'lucide-react';
+import { syncGitHubProfile } from '@/app/actions/github';
+import { Loader2, Github, Upload } from 'lucide-react';
 
 interface ProfileFormProps {
     profile: {
         username: string;
         displayName: string | null;
         bio: string | null;
+        avatar: string | null;
         location: string | null;
         openToWork: boolean | null;
         freelanceAvailable: boolean | null;
@@ -20,8 +22,44 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ profile }: ProfileFormProps) {
     const [loading, setLoading] = useState(false);
+    const [syncingGitHub, setSyncingGitHub] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState(profile.avatar || '');
+    const [uploadingImage, setUploadingImage] = useState(false);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Check file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            setError('Image size must be less than 2MB');
+            return;
+        }
+
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            setError('Please upload an image file');
+            return;
+        }
+
+        setUploadingImage(true);
+        setError(null);
+
+        try {
+            // Convert to base64 for preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            setError('Failed to upload image');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -42,6 +80,48 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         setLoading(false);
     }
 
+    async function handleSyncGitHub() {
+        setSyncingGitHub(true);
+        setError(null);
+        setSuccess(false);
+
+        const result = await syncGitHubProfile();
+        console.log(result);
+
+        if (result.error) {
+            setError(result.error);
+            setSyncingGitHub(false);
+        } else {
+            // Update form fields with GitHub data
+            if (result.username) {
+                (document.getElementById('username') as HTMLInputElement).value = result.username;
+            }
+            if (result.displayName) {
+                (document.getElementById('displayName') as HTMLInputElement).value = result.displayName;
+            }
+            if (result.bio) {
+                (document.getElementById('bio') as HTMLTextAreaElement).value = result.bio;
+            }
+            if (result.location) {
+                (document.getElementById('location') as HTMLInputElement).value = result.location;
+            }
+            if (result.avatar) {
+                setAvatarUrl(result.avatar);
+            }
+
+            setSyncingGitHub(false);
+
+            // Automatically submit the form to save changes
+            setSuccess(true);
+            setTimeout(() => {
+                const form = document.querySelector('form');
+                if (form) {
+                    form.requestSubmit();
+                }
+            }, 500);
+        }
+    }
+
     return (
         <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
@@ -52,11 +132,87 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Profile Image */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2 font-mono">
+                            Profile Image
+                        </label>
+                        <div className="flex items-center gap-4">
+                            {avatarUrl && (
+                                <img
+                                    src={avatarUrl}
+                                    alt="Profile"
+                                    className="w-20 h-20 rounded-full border-2 border-green-500 object-cover"
+                                />
+                            )}
+                            <div className="flex-1 space-y-2">
+                                <div className="flex gap-2">
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={uploadingImage}
+                                        className="border-green-600 text-green-400 hover:bg-green-600/10"
+                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                    >
+                                        {uploadingImage ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <Upload className="w-4 h-4 mr-1" />
+                                                Upload
+                                            </>
+                                        )}
+                                    </Button>
+                                    <input
+                                        id="avatar-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                    />
+                                    {/* Hidden input to submit avatar value */}
+                                    <input
+                                        type="hidden"
+                                        name="avatar"
+                                        value={avatarUrl}
+                                    />
+                                </div>
+                                <p className="text-xs text-slate-500">
+                                    Upload a file (max 2MB) or sync from GitHub
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Username */}
                     <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2 font-mono">
-                            Username *
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                            <label htmlFor="username" className="block text-sm font-medium text-slate-300 font-mono">
+                                Username *
+                            </label>
+                            <Button
+                                type="button"
+                                onClick={handleSyncGitHub}
+                                disabled={syncingGitHub}
+                                variant="outline"
+                                size="sm"
+                                className="border-green-600 text-green-400 hover:bg-green-600/10 font-mono text-xs"
+                            >
+                                {syncingGitHub ? (
+                                    <>
+                                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                        Syncing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Github className="w-3 h-3 mr-1" />
+                                        Sync from GitHub
+                                    </>
+                                )}
+                            </Button>
+                        </div>
                         <input
                             type="text"
                             id="username"

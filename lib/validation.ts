@@ -9,6 +9,7 @@ export const profileSchema = z.object({
         .regex(/^[a-z0-9-_]+$/, 'Username can only contain lowercase letters, numbers, hyphens, and underscores'),
     displayName: z.string().min(1, 'Display name is required').max(100),
     bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
+    avatar: z.string().optional(),
     location: z.string().max(100).optional(),
     openToWork: z.boolean().default(false),
     freelanceAvailable: z.boolean().default(false),

@@ -30,6 +30,7 @@ export async function updateProfile(formData: FormData) {
             username: formData.get('username') as string,
             displayName: formData.get('displayName') as string,
             bio: formData.get('bio') as string || undefined,
+            avatar: formData.get('avatar') as string || undefined,
             location: formData.get('location') as string || undefined,
             openToWork: formData.get('openToWork') === 'true',
             freelanceAvailable: formData.get('freelanceAvailable') === 'true',

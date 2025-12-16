@@ -2,7 +2,7 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { db } from '@/db';
-import { githubRepos } from '@/db/schema';
+import { githubRepos, profiles } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function syncGitHubRepos() {
@@ -31,7 +31,7 @@ export async function syncGitHubRepos() {
         // If not available, try to get it via Clerk's API
         if (!accessToken) {
             try {
-                const tokens = await client.users.getUserOauthAccessToken(userId, 'oauth_github');
+                const tokens = await client.users.getUserOauthAccessToken(userId, 'github');
                 accessToken = tokens.data[0]?.token;
             } catch (error) {
                 console.error('Failed to get OAuth token from Clerk:', error);
@@ -143,5 +143,90 @@ export async function togglePinRepo(repoId: string) {
     } catch (error) {
         console.error('Error toggling pin:', error);
         return { success: false, error: 'Failed to toggle pin' };
+    }
+}
+
+export async function syncGitHubProfile() {
+    const { userId } = await auth();
+
+    if (!userId) {
+        return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+        // Get GitHub access token from Clerk
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const githubAccount = user.externalAccounts.find(
+            (account: any) => account.provider === 'oauth_github'
+        );
+
+        if (!githubAccount) {
+            return { success: false, error: 'GitHub not connected' };
+        }
+
+        // Try to get access token
+        let accessToken = (githubAccount as any).accessToken;
+
+        if (!accessToken) {
+            try {
+                const tokens = await client.users.getUserOauthAccessToken(userId, 'github');
+                accessToken = tokens.data[0]?.token;
+            } catch (error) {
+                console.error('Failed to get OAuth token:', error);
+            }
+        }
+
+        if (!accessToken) {
+            return {
+                success: false,
+                error: 'GitHub access token not available'
+            };
+        }
+
+        // Fetch GitHub user data
+        const response = await fetch('https://api.github.com/user', {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                Accept: 'application/vnd.github.v3+json',
+            },
+        });
+
+        if (!response.ok) {
+            return { success: false, error: 'Failed to fetch GitHub profile' };
+        }
+
+        const githubUser = await response.json();
+
+        // Get user from database
+        const dbUser = await db.query.users.findFirst({
+            where: (users, { eq }) => eq(users.clerkId, userId),
+        });
+
+        if (!dbUser) {
+            return { success: false, error: 'User not found' };
+        }
+
+        // Update profile with GitHub data
+        await db
+            .update(profiles)
+            .set({
+                githubUsername: githubUser.login,
+                avatar: githubUser.avatar_url,
+                githubConnected: true,
+            })
+            .where(eq(profiles.userId, dbUser.id));
+
+        return {
+            success: true,
+            username: githubUser.login,
+            avatar: githubUser.avatar_url,
+            displayName: githubUser.name,
+            bio: githubUser.bio,
+            location: githubUser.location
+        };
+    } catch (error) {
+        console.error('Error syncing GitHub profile:', error);
+        return { success: false, error: 'Failed to sync GitHub profile' };
     }
 }
