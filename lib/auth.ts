@@ -26,7 +26,7 @@ export async function generateUniqueUsername(): Promise<string> {
 /**
  * Sync Clerk user to database
  */
-export async function syncUserToDatabase(clerkId: string, email: string) {
+export async function syncUserToDatabase(clerkId: string, email: string, claimedUsername?: string) {
     try {
         // Check if user already exists
         const existingUser = await db.query.users.findFirst({
@@ -46,8 +46,8 @@ export async function syncUserToDatabase(clerkId: string, email: string) {
             })
             .returning();
 
-        // Generate unique username
-        const username = await generateUniqueUsername();
+        // Use claimed username or generate a unique one
+        const username = claimedUsername || await generateUniqueUsername();
 
         // Create profile
         await db.insert(profiles).values({
@@ -79,6 +79,7 @@ export async function getUserProfileByClerkId(clerkId: string) {
 
 /**
  * Get public profile by username
+ * Returns null if profile doesn't exist OR if link is not activated (unpaid)
  */
 export async function getPublicProfile(username: string) {
     const profile = await db.query.profiles.findFirst({
@@ -100,10 +101,18 @@ export async function getPublicProfile(username: string) {
                         where: (repos, { eq }) => eq(repos.pinned, true),
                         orderBy: (repos, { desc }) => [desc(repos.stars)],
                     },
+                    currentActivities: {
+                        orderBy: (currentActivities, { desc }) => [desc(currentActivities.createdAt)],
+                    },
                 },
             },
         },
     });
+
+    // SECURITY: Block access if link is not activated (user hasn't paid)
+    if (!profile || !profile.isPublicLinkActive) {
+        return null;
+    }
 
     return profile;
 }

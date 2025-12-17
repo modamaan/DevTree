@@ -5,6 +5,7 @@ import { analyticsEvents } from '@/db/schema';
 import { headers } from 'next/headers';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import LinksList from '@/components/profile/LinksList';
+import CurrentActivities from '@/components/profile/CurrentActivities';
 import GitHubRepos from '@/components/profile/GitHubRepos';
 import TechStack from '@/components/profile/TechStack';
 import ProjectsShowcase from '@/components/profile/ProjectsShowcase';
@@ -75,11 +76,21 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                 )}
 
+                {/* Current Activities */}
+                {user.currentActivities && user.currentActivities.length > 0 && (
+                    <div className="mt-8 sm:mt-12">
+                        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
+                            {'>'} Current Activities
+                        </h2>
+                        <CurrentActivities activities={user.currentActivities} />
+                    </div>
+                )}
+
                 {/* GitHub Repos */}
                 {user.githubRepos && user.githubRepos.length > 0 && (
                     <div className="mt-8 sm:mt-12">
                         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
-                            {'>'} Pinned Repositories
+                            {'>'} Featured Projects
                         </h2>
                         <GitHubRepos repos={user.githubRepos} />
                     </div>

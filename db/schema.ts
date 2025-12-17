@@ -25,6 +25,7 @@ export const profiles = pgTable('profiles', {
     githubAccessToken: text('github_access_token'), // Encrypted in production
     resumeUrl: text('resume_url'),
     theme: text('theme').default('terminal'), // 'terminal' | 'vscode'
+    isPublicLinkActive: boolean('is_public_link_active').default(false), // Requires ₹20 payment
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -93,6 +94,56 @@ export const analyticsEvents = pgTable('analytics_events', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Current Activities table - what user is building/learning
+export const currentActivities = pgTable('current_activities', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    type: text('type').notNull(), // 'building' | 'learning'
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Features table - premium features catalog
+export const features = pgTable('features', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: text('name').notNull().unique(), // 'current_activities', 'advanced_analytics', etc.
+    displayName: text('display_name').notNull(),
+    description: text('description'),
+    price: integer('price').notNull(), // Price in paise (₹20 = 2000 paise)
+    currency: text('currency').notNull().default('INR'),
+    isActive: boolean('is_active').default(true),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Subscriptions table - user subscription tracking
+export const subscriptions = pgTable('subscriptions', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    featureId: uuid('feature_id').notNull().references(() => features.id),
+    status: text('status').notNull().default('active'), // 'active', 'expired', 'cancelled'
+    startDate: timestamp('start_date').defaultNow().notNull(),
+    endDate: timestamp('end_date'), // null for lifetime access
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Payments table - transaction records
+export const payments = pgTable('payments', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    featureId: uuid('feature_id').notNull().references(() => features.id),
+    subscriptionId: uuid('subscription_id').references(() => subscriptions.id),
+    amount: integer('amount').notNull(), // Amount in paise
+    currency: text('currency').notNull().default('INR'),
+    razorpayOrderId: text('razorpay_order_id').notNull(),
+    razorpayPaymentId: text('razorpay_payment_id'),
+    razorpaySignature: text('razorpay_signature'),
+    status: text('status').notNull().default('pending'), // 'pending', 'success', 'failed'
+    metadata: jsonb('metadata').$type<Record<string, any>>().default({}),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
     profile: one(profiles, {
@@ -104,6 +155,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     techStack: many(techStack),
     githubRepos: many(githubRepos),
     analyticsEvents: many(analyticsEvents),
+    currentActivities: many(currentActivities),
+    subscriptions: many(subscriptions),
+    payments: many(payments),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -145,5 +199,44 @@ export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => 
     user: one(users, {
         fields: [analyticsEvents.userId],
         references: [users.id],
+    }),
+}));
+
+export const currentActivitiesRelations = relations(currentActivities, ({ one }) => ({
+    user: one(users, {
+        fields: [currentActivities.userId],
+        references: [users.id],
+    }),
+}));
+
+export const featuresRelations = relations(features, ({ many }) => ({
+    subscriptions: many(subscriptions),
+    payments: many(payments),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+    user: one(users, {
+        fields: [subscriptions.userId],
+        references: [users.id],
+    }),
+    feature: one(features, {
+        fields: [subscriptions.featureId],
+        references: [features.id],
+    }),
+    payments: many(payments),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+    user: one(users, {
+        fields: [payments.userId],
+        references: [users.id],
+    }),
+    feature: one(features, {
+        fields: [payments.featureId],
+        references: [features.id],
+    }),
+    subscription: one(subscriptions, {
+        fields: [payments.subscriptionId],
+        references: [subscriptions.id],
     }),
 }));

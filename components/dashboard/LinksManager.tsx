@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { createLink, updateLink, deleteLink, reorderLinks } from '@/app/actions/links';
@@ -42,6 +42,10 @@ export default function LinksManager({ links: initialLinks }: LinksManagerProps)
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    // Debounce ref for reorder API calls
+    const reorderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const pendingUpdatesRef = useRef<{ id: string; order: number }[] | null>(null);
+
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -49,24 +53,42 @@ export default function LinksManager({ links: initialLinks }: LinksManagerProps)
         })
     );
 
+    // Debounced reorder function - waits 500ms after last drag before saving
+    const debouncedReorderLinks = useCallback((updates: { id: string; order: number }[]) => {
+        // Store the latest updates
+        pendingUpdatesRef.current = updates;
+
+        // Clear any existing timeout
+        if (reorderTimeoutRef.current) {
+            clearTimeout(reorderTimeoutRef.current);
+        }
+
+        // Set new timeout - only save after 500ms of inactivity
+        reorderTimeoutRef.current = setTimeout(() => {
+            if (pendingUpdatesRef.current) {
+                reorderLinks(pendingUpdatesRef.current);
+                pendingUpdatesRef.current = null;
+            }
+        }, 500);
+    }, []);
+
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            setLinks((items) => {
-                const oldIndex = items.findIndex((item) => item.id === active.id);
-                const newIndex = items.findIndex((item) => item.id === over.id);
-                const newItems = arrayMove(items, oldIndex, newIndex);
+            const oldIndex = links.findIndex((item) => item.id === active.id);
+            const newIndex = links.findIndex((item) => item.id === over.id);
+            const newItems = arrayMove(links, oldIndex, newIndex);
 
-                // Update orders in database
-                const updates = newItems.map((item, index) => ({
-                    id: item.id,
-                    order: index,
-                }));
-                reorderLinks(updates);
+            // Update state immediately for responsive UI
+            setLinks(newItems);
 
-                return newItems;
-            });
+            // Debounced save to database - batches rapid reorders
+            const updates = newItems.map((item, index) => ({
+                id: item.id,
+                order: index,
+            }));
+            debouncedReorderLinks(updates);
         }
     }
 

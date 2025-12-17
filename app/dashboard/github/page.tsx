@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Github, AlertCircle } from 'lucide-react';
 import { clerkClient } from '@clerk/nextjs/server';
-import GitHubConnectButton from '@/components/dashboard/GitHubConnectButton';
 import RepoManager from '@/components/dashboard/RepoManager';
 import { db } from '@/db';
 
@@ -102,36 +101,23 @@ export default async function GitHubPage() {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            <div className="p-4 bg-blue-900/20 border border-blue-700 rounded-lg flex items-start gap-3">
-                                <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                                <div className="text-sm text-blue-300">
-                                    <p className="font-semibold mb-1">GitHub OAuth Setup Required</p>
-                                    <p>
-                                        To enable GitHub integration, you need to configure GitHub OAuth in your Clerk dashboard.
-                                        Once configured, users will be able to connect their GitHub accounts.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="p-4 bg-slate-900/50 border border-slate-600 rounded-lg">
-                                <h3 className="font-semibold text-white mb-2 font-mono">Setup Instructions:</h3>
-                                <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
-                                    <li>Go to your Clerk Dashboard → Social Connections</li>
-                                    <li>Enable GitHub OAuth provider</li>
-                                    <li>Add required scopes: <code className="text-green-400">public_repo, read:user</code></li>
-                                    <li>Save and return here to connect</li>
-                                </ol>
-                            </div>
-
-                            <div className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
-                                <p className="text-yellow-400 text-sm font-mono mb-2">
-                                    ⚠️ After completing setup above:
+                            <div className="p-6 bg-slate-900/50 border border-slate-600 rounded-lg">
+                                <Github className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold text-white mb-3 font-mono text-center">Connect GitHub</h3>
+                                <p className="text-slate-400 mb-6 text-center">
+                                    Link your GitHub account to showcase your repositories on your DevTree profile
                                 </p>
-                                <ol className="text-sm text-yellow-300 space-y-1 list-decimal list-inside">
-                                    <li>Click your profile avatar (top right)</li>
-                                    <li>Select "Connected accounts"</li>
-                                    <li>Click "Connect" next to GitHub</li>
-                                </ol>
+
+                                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 text-left">
+                                    <h4 className="font-semibold text-green-400 mb-3 font-mono">How to Connect:</h4>
+                                    <ol className="text-sm text-slate-300 space-y-2 list-decimal list-inside">
+                                        <li>Click your <strong>profile avatar</strong> in the top right corner</li>
+                                        <li>Select <strong>"Manage account"</strong> from the dropdown</li>
+                                        <li>Go to <strong>"Connected accounts"</strong> tab</li>
+                                        <li>Click <strong>"Connect"</strong> next to GitHub</li>
+                                        <li>Authorize DevTree to access your public repositories</li>
+                                    </ol>
+                                </div>
                             </div>
                         </div>
                     )}

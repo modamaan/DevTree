@@ -7,6 +7,8 @@ import { eq, and, gte, sql } from 'drizzle-orm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, MousePointerClick, Download } from 'lucide-react';
 import { unstable_cache } from 'next/cache';
+import LinkActivationBanner from '@/components/dashboard/LinkActivationBanner';
+import UsernameClaimHandler from '@/components/auth/UsernameClaimHandler';
 
 export const dynamic = 'force-dynamic'; // Disable static generation for auth
 
@@ -72,9 +74,20 @@ export default async function DashboardPage() {
 
     return (
         <div>
+            {/* Username Claim Handler - runs after sign-up */}
+            <UsernameClaimHandler />
+
             <div className="mb-6 sm:mb-8">
                 <h1 className="text-2xl sm:text-3xl font-bold text-green-400 font-mono mb-2">{'>'} Dashboard</h1>
                 <p className="text-sm sm:text-base text-slate-400">Welcome back! Here's your profile overview.</p>
+            </div>
+
+            {/* Link Activation Banner */}
+            <div className="mb-6">
+                <LinkActivationBanner
+                    username={userProfile.profile?.username || ''}
+                    isActive={userProfile.profile?.isPublicLinkActive || false}
+                />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
