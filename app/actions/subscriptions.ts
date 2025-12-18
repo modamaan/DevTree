@@ -7,6 +7,7 @@ import { eq, and } from 'drizzle-orm';
 
 /**
  * Check if user has access to a specific feature
+ * Now simplified: if user paid for public link, they get ALL features
  */
 export async function hasFeatureAccess(featureName: string): Promise<boolean> {
     try {
@@ -18,31 +19,17 @@ export async function hasFeatureAccess(featureName: string): Promise<boolean> {
 
         const user = await db.query.users.findFirst({
             where: (users, { eq }) => eq(users.clerkId, userId),
+            with: {
+                profile: true,
+            },
         });
 
-        if (!user) {
+        if (!user?.profile) {
             return false;
         }
 
-        // Get feature
-        const feature = await db.query.features.findFirst({
-            where: eq(features.name, featureName),
-        });
-
-        if (!feature) {
-            return false;
-        }
-
-        // Check if user has active subscription
-        const subscription = await db.query.subscriptions.findFirst({
-            where: and(
-                eq(subscriptions.userId, user.id),
-                eq(subscriptions.featureId, feature.id),
-                eq(subscriptions.status, 'active')
-            ),
-        });
-
-        return !!subscription;
+        // If public link is active (user paid ₹20), they have access to ALL features
+        return user.profile.isPublicLinkActive ?? false;
     } catch (error) {
         console.error('Error checking feature access:', error);
         return false;
