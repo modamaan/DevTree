@@ -139,7 +139,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
                 {/* Footer */}
                 <div className={`mt-12 sm:mt-16 text-center text-xs sm:text-sm ${theme.styles.textMuted} font-mono`}>
-                    <p>Powered by DevTree</p>
+                    <a
+                        href="https://www.devtree.site/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-green-400 transition-colors"
+                    >
+                        Powered by DevTree
+                    </a>
                 </div>
             </div>
         </ThemedProfileWrapper>
