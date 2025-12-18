@@ -94,6 +94,9 @@ export async function getPublicProfile(username: string) {
                     projects: {
                         orderBy: (projects, { asc }) => [asc(projects.order)],
                     },
+                    experiences: {
+                        orderBy: (experiences, { desc }) => [desc(experiences.order)],
+                    },
                     techStack: {
                         orderBy: (techStack, { asc }) => [asc(techStack.order)],
                     },

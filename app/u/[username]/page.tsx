@@ -9,6 +9,7 @@ import CurrentActivities from '@/components/profile/CurrentActivities';
 import GitHubRepos from '@/components/profile/GitHubRepos';
 import TechStack from '@/components/profile/TechStack';
 import ProjectsShowcase from '@/components/profile/ProjectsShowcase';
+import ExperienceSection from '@/components/profile/ExperienceSection';
 import ResumeSection from '@/components/profile/ResumeSection';
 import ThemedProfileWrapper from '@/components/profile/ThemedProfileWrapper';
 import { getThemeById } from '@/lib/themes';
@@ -85,8 +86,18 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
                 {/* Links Section */}
                 {user.links && user.links.length > 0 && (
-                    <div className="mt-6 sm:mt-8">
+                    <div className="mt-8 sm:mt-12">
                         <LinksList links={user.links} userId={profile.userId} />
+                    </div>
+                )}
+
+                {/* Experience */}
+                {user.experiences && user.experiences.length > 0 && (
+                    <div className="mt-6 sm:mt-8">
+                        <ExperienceSection
+                            experiences={user.experiences}
+                            themeStyles={theme.styles}
+                        />
                     </div>
                 )}
 
@@ -149,6 +160,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </a>
                 </div>
             </div>
-        </ThemedProfileWrapper>
+        </ThemedProfileWrapper >
     );
 }

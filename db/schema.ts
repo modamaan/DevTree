@@ -64,6 +64,21 @@ export const projects = pgTable('projects', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Experiences table - work history and professional experience
+export const experiences = pgTable('experiences', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    company: text('company').notNull(), // Company name or "Freelance"
+    role: text('role').notNull(), // Job title/position
+    employmentType: text('employment_type').notNull(), // 'full-time', 'part-time', 'freelance', 'contract', 'internship'
+    startDate: text('start_date').notNull(), // Format: "YYYY-MM" or "YYYY"
+    endDate: text('end_date'), // null = "Present"
+    description: text('description'), // Markdown supported, responsibilities/achievements
+    location: text('location'), // "Remote", "San Francisco, CA", etc.
+    order: integer('order').notNull().default(0),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Tech Stack table - technologies user knows
 export const techStack = pgTable('tech_stack', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -159,6 +174,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     }),
     links: many(links),
     projects: many(projects),
+    experiences: many(experiences),
     techStack: many(techStack),
     githubRepos: many(githubRepos),
     analyticsEvents: many(analyticsEvents),
@@ -184,6 +200,13 @@ export const linksRelations = relations(links, ({ one }) => ({
 export const projectsRelations = relations(projects, ({ one }) => ({
     user: one(users, {
         fields: [projects.userId],
+        references: [users.id],
+    }),
+}));
+
+export const experiencesRelations = relations(experiences, ({ one }) => ({
+    user: one(users, {
+        fields: [experiences.userId],
         references: [users.id],
     }),
 }));
