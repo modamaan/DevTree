@@ -161,6 +161,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
                             Terms & Conditions
                         </Link>
                         <span className="text-slate-600">•</span>
+                        <Link href="/shipping" className="hover:text-green-400 transition-colors">
+                            Shipping Policy
+                        </Link>
+                        <span className="text-slate-600">•</span>
                         <Link href="/refund-policy" className="hover:text-green-400 transition-colors">
                             Refund Policy
                         </Link>
