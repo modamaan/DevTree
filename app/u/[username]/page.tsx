@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getPublicProfile } from '@/lib/auth';
 import { db } from '@/db';
 import { analyticsEvents } from '@/db/schema';
@@ -149,15 +150,37 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 )}
 
                 {/* Footer */}
-                <div className={`mt-12 sm:mt-16 text-center text-xs sm:text-sm ${theme.styles.textMuted} font-mono`}>
-                    <a
-                        href="https://www.devtree.site/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-green-400 transition-colors"
-                    >
-                        Powered by DevTree
-                    </a>
+                <div className={`mt-12 sm:mt-16 text-center space-y-3 ${theme.styles.textMuted} font-mono`}>
+                    {/* Legal Links */}
+                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs sm:text-sm">
+                        <Link href="/privacy" className="hover:text-green-400 transition-colors">
+                            Privacy Policy
+                        </Link>
+                        <span className="text-slate-600">•</span>
+                        <Link href="/terms" className="hover:text-green-400 transition-colors">
+                            Terms & Conditions
+                        </Link>
+                        <span className="text-slate-600">•</span>
+                        <Link href="/refund-policy" className="hover:text-green-400 transition-colors">
+                            Refund Policy
+                        </Link>
+                        <span className="text-slate-600">•</span>
+                        <Link href="/contact" className="hover:text-green-400 transition-colors">
+                            Contact
+                        </Link>
+                    </div>
+
+                    {/* Powered by DevTree */}
+                    <div className="text-xs sm:text-sm">
+                        <a
+                            href="https://www.devtree.site/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-green-400 transition-colors"
+                        >
+                            Powered by DevTree
+                        </a>
+                    </div>
                 </div>
             </div>
         </ThemedProfileWrapper >
