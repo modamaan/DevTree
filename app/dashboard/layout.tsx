@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getUserProfileByClerkId } from '@/lib/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Link as LinkIcon, FolderGit2, Code, FileText, Github, BarChart3, User } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, FolderGit2, Code, FileText, Github, BarChart3, User, Palette } from 'lucide-react';
 import MobileNav from '@/components/dashboard/MobileNav';
 import LogoutButton from '@/components/dashboard/LogoutButton';
 import ClerkUserButton from '@/components/dashboard/ClerkUserButton';
@@ -30,6 +30,7 @@ export default async function DashboardLayout({
     const navLinks = [
         { href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Overview' },
         { href: '/dashboard/profile', icon: <User className="w-5 h-5" />, label: 'Profile' },
+        { href: '/dashboard/design', icon: <Palette className="w-5 h-5" />, label: 'Design' },
         { href: '/dashboard/links', icon: <LinkIcon className="w-5 h-5" />, label: 'Links' },
         { href: '/dashboard/projects', icon: <FolderGit2 className="w-5 h-5" />, label: 'Projects' },
         { href: '/dashboard/tech-stack', icon: <Code className="w-5 h-5" />, label: 'Tech Stack' },

@@ -26,6 +26,13 @@ export const profiles = pgTable('profiles', {
     resumeUrl: text('resume_url'),
     theme: text('theme').default('terminal'), // 'terminal' | 'vscode'
     isPublicLinkActive: boolean('is_public_link_active').default(false), // Requires ₹20 payment
+    // Design customization fields
+    themeId: text('theme_id').default('terminal'), // Theme identifier
+    wallpaperType: text('wallpaper_type').default('gradient'), // 'solid' | 'gradient' | 'blur' | 'pattern'
+    wallpaperValue: text('wallpaper_value'), // Color hex, gradient string, or pattern name
+    buttonStyle: text('button_style').default('rounded'), // 'rounded' | 'pill' | 'square' | 'outline'
+    buttonColor: text('button_color').default('#22c55e'), // Primary button color
+    fontFamily: text('font_family').default('mono'), // 'mono' | 'sans' | 'serif'
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

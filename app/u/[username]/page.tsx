@@ -10,6 +10,8 @@ import GitHubRepos from '@/components/profile/GitHubRepos';
 import TechStack from '@/components/profile/TechStack';
 import ProjectsShowcase from '@/components/profile/ProjectsShowcase';
 import ResumeSection from '@/components/profile/ResumeSection';
+import ThemedProfileWrapper from '@/components/profile/ThemedProfileWrapper';
+import { getThemeById } from '@/lib/themes';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -60,12 +62,24 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
     const { user } = profile;
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-            {/* Terminal theme styling */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+    // Get theme settings with fallbacks
+    const themeId = profile.themeId || 'terminal';
+    const theme = getThemeById(themeId);
+    const wallpaperType = profile.wallpaperType || 'gradient';
+    const wallpaperValue = profile.wallpaperValue;
+    const fontFamily = profile.fontFamily || 'mono';
 
-            <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    // Get heading color class from theme
+    const headingColor = theme.styles.heading;
+
+    return (
+        <ThemedProfileWrapper
+            themeId={themeId}
+            wallpaperType={wallpaperType}
+            wallpaperValue={wallpaperValue}
+            fontFamily={fontFamily}
+        >
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
                 {/* Profile Header */}
                 <ProfileHeader profile={profile} />
 
@@ -79,7 +93,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* Current Activities */}
                 {user.currentActivities && user.currentActivities.length > 0 && (
                     <div className="mt-8 sm:mt-12">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
+                        <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${headingColor} font-mono`}>
                             {'>'} Current Activities
                         </h2>
                         <CurrentActivities activities={user.currentActivities} />
@@ -89,7 +103,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* GitHub Repos */}
                 {user.githubRepos && user.githubRepos.length > 0 && (
                     <div className="mt-8 sm:mt-12">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
+                        <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${headingColor} font-mono`}>
                             {'>'} Featured Projects
                         </h2>
                         <GitHubRepos repos={user.githubRepos} />
@@ -99,7 +113,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* Tech Stack */}
                 {user.techStack && user.techStack.length > 0 && (
                     <div className="mt-8 sm:mt-12">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
+                        <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${headingColor} font-mono`}>
                             {'>'} Tech Stack
                         </h2>
                         <TechStack techStack={user.techStack} />
@@ -109,7 +123,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 {/* Projects */}
                 {user.projects && user.projects.length > 0 && (
                     <div className="mt-8 sm:mt-12">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-green-400 font-mono">
+                        <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${headingColor} font-mono`}>
                             {'>'} Projects
                         </h2>
                         <ProjectsShowcase projects={user.projects} />
@@ -124,10 +138,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 )}
 
                 {/* Footer */}
-                <div className="mt-12 sm:mt-16 text-center text-xs sm:text-sm text-slate-500 font-mono">
+                <div className={`mt-12 sm:mt-16 text-center text-xs sm:text-sm ${theme.styles.textMuted} font-mono`}>
                     <p>Powered by DevTree</p>
                 </div>
             </div>
-        </div>
+        </ThemedProfileWrapper>
     );
 }
