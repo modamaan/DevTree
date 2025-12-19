@@ -87,7 +87,7 @@ export default function UsernameClaimForm() {
                 <div className="flex-1 relative">
                     <div className="flex items-center bg-white rounded-full border-2 border-slate-300 focus-within:border-slate-900 transition-colors overflow-hidden">
                         <span className="pl-6 pr-2 text-slate-500 font-mono text-lg">
-                            localhost:3000/u/
+                            devtree.site/u/
                         </span>
                         <input
                             type="text"
