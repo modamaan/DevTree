@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Rocket, ExternalLink } from 'lucide-react';
-import PaymentModal from '@/components/payment/PaymentModal';
+import { Rocket, ExternalLink, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { activatePublicLink } from '@/app/actions/links';
+import { useToast } from '@/hooks/use-toast';
 
 interface LinkActivationBannerProps {
     username: string;
@@ -13,8 +14,9 @@ interface LinkActivationBannerProps {
 }
 
 export default function LinkActivationBanner({ username, isActive }: LinkActivationBannerProps) {
-    const [showPayment, setShowPayment] = useState(false);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { toast } = useToast();
 
     if (isActive) {
         return (
@@ -44,47 +46,68 @@ export default function LinkActivationBanner({ username, isActive }: LinkActivat
         );
     }
 
-    return (
-        <>
-            <Card className="bg-orange-900/20 border-orange-700">
-                <CardHeader className="pb-3 sm:pb-6">
-                    <CardTitle className="text-orange-400 font-mono flex items-center gap-2 text-base sm:text-lg">
-                        <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
-                        Activate Your Public Link
-                    </CardTitle>
-                    <CardDescription className="text-orange-300 text-sm sm:text-base">
-                        Your profile is ready! Pay ₹20 to activate your public link and share it with the world.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
-                        <div className="w-full sm:w-auto">
-                            <p className="text-slate-300 mb-1 text-sm">Your link will be:</p>
-                            <p className="text-white font-mono text-base sm:text-lg break-all">devtree.site/{username}</p>
-                        </div>
-                        <Button
-                            onClick={() => setShowPayment(true)}
-                            className="bg-orange-600 hover:bg-orange-700 text-white font-mono w-full sm:w-auto text-sm sm:text-base whitespace-nowrap"
-                        >
-                            Activate for ₹20
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+    async function handleActivate() {
+        try {
+            setLoading(true);
+            const result = await activatePublicLink();
 
-            {showPayment && (
-                <PaymentModal
-                    featureName="link_activation"
-                    featureDisplayName="Public Link Activation"
-                    featureDescription="Activate your public DevTree link and share your profile with the world"
-                    price={20}
-                    onSuccess={() => {
-                        setShowPayment(false);
-                        router.refresh();
-                    }}
-                    onClose={() => setShowPayment(false)}
-                />
-            )}
-        </>
+            if (result.error) {
+                toast({
+                    title: 'Error',
+                    description: result.error,
+                    variant: 'destructive',
+                });
+            } else {
+                toast({
+                    title: 'Success! 🎉',
+                    description: 'Your public link is now active!',
+                });
+                router.refresh();
+            }
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Failed to activate link. Please try again.',
+                variant: 'destructive',
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <Card className="bg-green-900/20 border-green-700">
+            <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-green-400 font-mono flex items-center gap-2 text-base sm:text-lg">
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
+                    Activate Your Public Link
+                </CardTitle>
+                <CardDescription className="text-green-300 text-sm sm:text-base">
+                    Your profile is ready! Activate your public link for free and share it with the world.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+                    <div className="w-full sm:w-auto">
+                        <p className="text-slate-300 mb-1 text-sm">Your link will be:</p>
+                        <p className="text-white font-mono text-base sm:text-lg break-all">devtree.site/{username}</p>
+                    </div>
+                    <Button
+                        onClick={handleActivate}
+                        disabled={loading}
+                        className="bg-green-600 hover:bg-green-700 text-white font-mono w-full sm:w-auto text-sm sm:text-base whitespace-nowrap"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Activating...
+                            </>
+                        ) : (
+                            'Activate for Free'
+                        )}
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

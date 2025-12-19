@@ -150,3 +150,43 @@ export async function reorderLinks(linkOrders: { id: string; order: number }[]) 
         return { error: error.message || 'Failed to reorder links' };
     }
 }
+
+export async function activatePublicLink() {
+    try {
+        const { userId } = await auth();
+
+        if (!userId) {
+            return { error: 'Unauthorized' };
+        }
+
+        const user = await db.query.users.findFirst({
+            where: (users, { eq }) => eq(users.clerkId, userId),
+        });
+
+        if (!user) {
+            return { error: 'User not found' };
+        }
+
+        // Get user's profile
+        const profile = await db.query.profiles.findFirst({
+            where: (profiles, { eq }) => eq(profiles.userId, user.id),
+        });
+
+        if (!profile) {
+            return { error: 'Profile not found' };
+        }
+
+        // Activate the public link for free
+        const { profiles } = await import('@/db/schema');
+        await db
+            .update(profiles)
+            .set({ isPublicLinkActive: true })
+            .where(eq(profiles.userId, user.id));
+
+        revalidatePath('/dashboard');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error activating public link:', error);
+        return { error: error.message || 'Failed to activate public link' };
+    }
+}
