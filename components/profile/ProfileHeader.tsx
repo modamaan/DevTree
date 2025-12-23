@@ -34,14 +34,14 @@ function ProfileContent({ profile }: { profile: ProfileHeaderProps['profile'] })
             )}
 
             {profile.location && (
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center justify-center gap-2 text-slate-400">
                     <MapPin className="w-4 h-4" />
                     <span>{profile.location}</span>
                 </div>
             )}
 
             {(profile.githubUrl || profile.linkedinUrl || profile.twitterUrl || profile.websiteUrl) && (
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 justify-center">
                     {profile.githubUrl && (
                         <a
                             href={profile.githubUrl}
@@ -112,7 +112,7 @@ function TerminalHeader({ profile, initials, handleShare, copied }: any) {
             </div>
 
             <div className="p-6 sm:p-8">
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex flex-col gap-6 items-center text-center">
                     <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-green-500">
                         <AvatarImage src={profile.avatar || undefined} alt={profile.displayName || profile.username} />
                         <AvatarFallback className="bg-slate-700 text-green-400 text-2xl font-bold">
@@ -120,7 +120,7 @@ function TerminalHeader({ profile, initials, handleShare, copied }: any) {
                         </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex-1 space-y-4">
+                    <div className="w-full space-y-4">
                         <div>
                             <h1 className="text-2xl sm:text-3xl font-bold text-green-400 font-mono">
                                 {profile.displayName || profile.username}

@@ -6,6 +6,7 @@ export const users = pgTable('users', {
     id: uuid('id').defaultRandom().primaryKey(),
     clerkId: text('clerk_id').notNull().unique(),
     email: text('email').notNull(),
+    hasSeenSharePopup: boolean('has_seen_share_popup').default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

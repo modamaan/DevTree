@@ -2,13 +2,14 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { getUserProfileByClerkId, syncUserToDatabase } from '@/lib/auth';
 import { db } from '@/db';
-import { analyticsEvents } from '@/db/schema';
+import { analyticsEvents, users } from '@/db/schema';
 import { eq, and, gte, sql } from 'drizzle-orm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, MousePointerClick, Download } from 'lucide-react';
 import { unstable_cache } from 'next/cache';
 import LinkActivationBanner from '@/components/dashboard/LinkActivationBanner';
 import UsernameClaimHandler from '@/components/auth/UsernameClaimHandler';
+import SharePopup from '@/components/dashboard/SharePopup';
 
 export const dynamic = 'force-dynamic'; // Disable static generation for auth
 
@@ -34,6 +35,13 @@ export default async function DashboardPage() {
     if (!userProfile) {
         redirect('/');
     }
+
+    // Get user's share popup status
+    const user = await db.query.users.findFirst({
+        where: eq(users.clerkId, userId),
+    });
+
+    const hasSeenSharePopup = user?.hasSeenSharePopup ?? false;
 
     // Get analytics for the last 30 days
     const thirtyDaysAgo = new Date();
@@ -74,6 +82,9 @@ export default async function DashboardPage() {
 
     return (
         <div>
+            {/* Share Popup - appears on first dashboard visit */}
+            <SharePopup hasSeenPopup={hasSeenSharePopup} />
+
             {/* Username Claim Handler - runs after sign-up */}
             <UsernameClaimHandler />
 
