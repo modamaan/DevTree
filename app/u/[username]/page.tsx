@@ -70,6 +70,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
     const wallpaperType = profile.wallpaperType || 'gradient';
     const wallpaperValue = profile.wallpaperValue;
     const fontFamily = profile.fontFamily || 'mono';
+    const buttonColor = profile.buttonColor || '#22c55e';
+    const buttonStyle = profile.buttonStyle || 'rounded';
+    const headerStyle = profile.headerStyle || 'terminal';
 
     // Get heading color class from theme
     const headingColor = theme.styles.heading;
@@ -83,12 +86,17 @@ export default async function PublicProfilePage({ params }: PageProps) {
         >
             <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
                 {/* Profile Header */}
-                <ProfileHeader profile={profile} />
+                <ProfileHeader profile={profile} headerStyle={headerStyle} />
 
                 {/* Links Section */}
                 {user.links && user.links.length > 0 && (
                     <div className="mt-8 sm:mt-12">
-                        <LinksList links={user.links} userId={profile.userId} />
+                        <LinksList
+                            links={user.links}
+                            userId={profile.userId}
+                            buttonColor={buttonColor}
+                            buttonStyle={buttonStyle}
+                        />
                     </div>
                 )}
 

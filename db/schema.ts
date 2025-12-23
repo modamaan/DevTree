@@ -33,6 +33,7 @@ export const profiles = pgTable('profiles', {
     buttonStyle: text('button_style').default('rounded'), // 'rounded' | 'pill' | 'square' | 'outline'
     buttonColor: text('button_color').default('#22c55e'), // Primary button color
     fontFamily: text('font_family').default('mono'), // 'mono' | 'sans' | 'serif'
+    headerStyle: text('header_style').default('terminal'), // 'terminal' | 'minimal' | 'card' | 'centered' | 'split'
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

@@ -92,16 +92,19 @@ export default function ExperienceManager({ experiences: initialExperiences }: E
     return (
         <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-green-400 font-mono">💼 Experience</CardTitle>
+                        <CardTitle className="text-green-400 font-mono flex items-center gap-2">
+                            <Briefcase className="w-5 h-5" />
+                            Experience
+                        </CardTitle>
                         <CardDescription className="text-slate-400">
                             Showcase your work history and professional experience
                         </CardDescription>
                     </div>
                     <Button
                         onClick={() => setShowAddForm(true)}
-                        className="bg-green-600 hover:bg-green-700 text-white font-mono"
+                        className="bg-green-600 hover:bg-green-700 text-white font-mono w-full sm:w-auto"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         Add Experience
@@ -143,70 +146,81 @@ export default function ExperienceManager({ experiences: initialExperiences }: E
                                         }}
                                     />
                                 ) : (
-                                    <Card className="bg-slate-900/50 border-slate-700">
+                                    <Card className="bg-slate-900/50 border-slate-700 hover:border-slate-600 transition-colors">
                                         <CardContent className="p-4 sm:p-6">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1 space-y-3">
-                                                    {/* Header */}
-                                                    <div>
-                                                        <h3 className="text-lg font-bold text-white">
+                                            <div className="space-y-4">
+                                                {/* Header with Actions */}
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-lg sm:text-xl font-bold text-white truncate">
                                                             {exp.role}
                                                         </h3>
-                                                        <p className="text-green-400 font-mono flex items-center gap-2">
-                                                            <Briefcase className="w-4 h-4" />
-                                                            {exp.company}
+                                                        <p className="text-green-400 font-mono text-sm sm:text-base flex items-center gap-2 mt-1">
+                                                            <Briefcase className="w-4 h-4 flex-shrink-0" />
+                                                            <span className="truncate">{exp.company}</span>
                                                         </p>
                                                     </div>
 
-                                                    {/* Meta Info */}
-                                                    <div className="flex flex-wrap gap-2">
-                                                        <Badge className={`${getEmploymentTypeColor(exp.employmentType)} text-white font-mono text-xs`}>
-                                                            {exp.employmentType.split('-').map(word =>
-                                                                word.charAt(0).toUpperCase() + word.slice(1)
-                                                            ).join(' ')}
-                                                        </Badge>
-                                                        <Badge variant="outline" className="border-slate-600 text-slate-300 font-mono text-xs">
-                                                            <Calendar className="w-3 h-3 mr-1" />
-                                                            {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-                                                            <span className="ml-1 text-slate-500">
-                                                                ({calculateDuration(exp.startDate, exp.endDate)})
-                                                            </span>
-                                                        </Badge>
-                                                        {exp.location && (
-                                                            <Badge variant="outline" className="border-slate-600 text-slate-300 font-mono text-xs">
-                                                                <MapPin className="w-3 h-3 mr-1" />
-                                                                {exp.location}
-                                                            </Badge>
-                                                        )}
+                                                    {/* Action Buttons - More Prominent */}
+                                                    <div className="flex gap-2 flex-shrink-0">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => setEditingId(exp.id)}
+                                                            className="border-slate-600 text-slate-300 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all"
+                                                            title="Edit experience"
+                                                        >
+                                                            <Pencil className="w-4 h-4" />
+                                                            <span className="hidden sm:inline ml-2">Edit</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleDelete(exp.id)}
+                                                            className="border-slate-600 text-slate-300 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all"
+                                                            title="Delete experience"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                            <span className="hidden sm:inline ml-2">Delete</span>
+                                                        </Button>
                                                     </div>
+                                                </div>
 
-                                                    {/* Description */}
-                                                    {exp.description && (
-                                                        <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
-                                                            {exp.description}
-                                                        </div>
+                                                {/* Meta Info */}
+                                                <div className="flex flex-wrap gap-2">
+                                                    <Badge className={`${getEmploymentTypeColor(exp.employmentType)} text-white font-mono text-xs`}>
+                                                        {exp.employmentType.split('-').map(word =>
+                                                            word.charAt(0).toUpperCase() + word.slice(1)
+                                                        ).join(' ')}
+                                                    </Badge>
+                                                    <Badge variant="outline" className="border-slate-600 text-slate-300 font-mono text-xs">
+                                                        <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
+                                                        <span className="truncate">
+                                                            {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                                                        </span>
+                                                        <span className="ml-1 text-slate-500 hidden sm:inline">
+                                                            ({calculateDuration(exp.startDate, exp.endDate)})
+                                                        </span>
+                                                    </Badge>
+                                                    {exp.location && (
+                                                        <Badge variant="outline" className="border-slate-600 text-slate-300 font-mono text-xs">
+                                                            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                                                            <span className="truncate">{exp.location}</span>
+                                                        </Badge>
                                                     )}
                                                 </div>
 
-                                                {/* Actions */}
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => setEditingId(exp.id)}
-                                                        className="text-slate-400 hover:text-green-400"
-                                                    >
-                                                        <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(exp.id)}
-                                                        className="text-slate-400 hover:text-red-400"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
+                                                {/* Duration on mobile (below badges) */}
+                                                <div className="sm:hidden text-xs text-slate-500 font-mono">
+                                                    Duration: {calculateDuration(exp.startDate, exp.endDate)}
                                                 </div>
+
+                                                {/* Description */}
+                                                {exp.description && (
+                                                    <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                                                        {exp.description}
+                                                    </div>
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -254,13 +268,8 @@ function ExperienceForm({
             setError(result.error);
             setLoading(false);
         } else {
-            // Fetch the updated/new experience
-            const formDataObj = Object.fromEntries(formData.entries());
-            onSuccess({
-                id: experience?.id || Date.now().toString(),
-                ...formDataObj,
-                endDate: isPresent ? null : formDataObj.endDate,
-            });
+            // Reload the page to get fresh data from server
+            window.location.reload();
         }
     }
 

@@ -14,6 +14,7 @@ const designSchema = z.object({
     buttonStyle: z.enum(['rounded', 'pill', 'square', 'outline']),
     buttonColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
     fontFamily: z.enum(['mono', 'sans', 'serif']),
+    headerStyle: z.enum(['terminal', 'code_editor', 'git_commit', 'readme', 'console_log']),
 });
 
 export async function updateDesign(formData: FormData) {
@@ -42,6 +43,7 @@ export async function updateDesign(formData: FormData) {
             buttonStyle: formData.get('buttonStyle') as string,
             buttonColor: formData.get('buttonColor') as string,
             fontFamily: formData.get('fontFamily') as string,
+            headerStyle: formData.get('headerStyle') as string,
         };
 
         const validated = designSchema.parse(data);
@@ -55,6 +57,7 @@ export async function updateDesign(formData: FormData) {
                 buttonStyle: validated.buttonStyle,
                 buttonColor: validated.buttonColor,
                 fontFamily: validated.fontFamily,
+                headerStyle: validated.headerStyle,
                 updatedAt: new Date(),
             })
             .where(eq(profiles.id, user.profile.id));
@@ -98,6 +101,7 @@ export async function getDesignSettings() {
             buttonStyle: user.profile.buttonStyle || 'rounded',
             buttonColor: user.profile.buttonColor || '#22c55e',
             fontFamily: user.profile.fontFamily || 'mono',
+            headerStyle: user.profile.headerStyle || 'terminal',
         };
     } catch (error) {
         console.error('Error getting design settings:', error);

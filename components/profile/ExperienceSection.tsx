@@ -96,8 +96,6 @@ export default function ExperienceSection({ experiences, themeStyles }: Experien
                         )}
 
                         <div className={`${themeStyles.card} backdrop-blur-sm border ${themeStyles.cardBorder} rounded-lg p-4 sm:p-6 relative`}>
-                            {/* Timeline dot */}
-                            <div className={`absolute left-[-8px] top-6 w-6 h-6 rounded-full ${themeStyles.accent.replace('text-', 'bg-')} border-4 border-slate-900 hidden sm:block`} />
 
                             <div className="space-y-3">
                                 {/* Header */}
