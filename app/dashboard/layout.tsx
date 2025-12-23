@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getUserProfileByClerkId } from '@/lib/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Link as LinkIcon, FolderGit2, Code, FileText, Github, BarChart3, User, Palette, Briefcase } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, FolderGit2, Code, FileText, Github, BarChart3, User, Palette, Briefcase, DollarSign } from 'lucide-react';
 import MobileNav from '@/components/dashboard/MobileNav';
 import LogoutButton from '@/components/dashboard/LogoutButton';
 import ClerkUserButton from '@/components/dashboard/ClerkUserButton';
@@ -38,6 +38,7 @@ export default async function DashboardLayout({
         { href: '/dashboard/github', icon: <Github className="w-5 h-5" />, label: 'GitHub' },
         { href: '/dashboard/resume', icon: <FileText className="w-5 h-5" />, label: 'Resume' },
         { href: '/dashboard/analytics', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
+        { href: '/dashboard/earn', icon: <DollarSign className="w-5 h-5" />, label: 'Earn 💰' },
     ];
 
     return (

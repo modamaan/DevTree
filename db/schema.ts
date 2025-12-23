@@ -127,6 +127,32 @@ export const currentActivities = pgTable('current_activities', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Monetization Links table - external links for earning money
+export const monetizationLinks = pgTable('monetization_links', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    category: text('category').$type<'product' | 'booking' | 'affiliate'>().notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    url: text('url').notNull(), // External link (Gumroad, Topmate, etc.)
+    price: integer('price'), // Display price (in paise) - optional
+    coverImage: text('cover_image'), // For products
+    clicks: integer('clicks').default(0),
+    order: integer('order').notNull().default(0),
+    isActive: boolean('is_active').default(true),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Monetization Clicks table - track clicks for analytics
+export const monetizationClicks = pgTable('monetization_clicks', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    linkId: uuid('link_id').notNull().references(() => monetizationLinks.id, { onDelete: 'cascade' }),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    clickedAt: timestamp('clicked_at').defaultNow().notNull(),
+});
+
 // Features table - premium features catalog
 export const features = pgTable('features', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -181,6 +207,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     githubRepos: many(githubRepos),
     analyticsEvents: many(analyticsEvents),
     currentActivities: many(currentActivities),
+    monetizationLinks: many(monetizationLinks),
     subscriptions: many(subscriptions),
     payments: many(payments),
 }));
@@ -238,6 +265,21 @@ export const currentActivitiesRelations = relations(currentActivities, ({ one })
     user: one(users, {
         fields: [currentActivities.userId],
         references: [users.id],
+    }),
+}));
+
+export const monetizationLinksRelations = relations(monetizationLinks, ({ one, many }) => ({
+    user: one(users, {
+        fields: [monetizationLinks.userId],
+        references: [users.id],
+    }),
+    clicks: many(monetizationClicks),
+}));
+
+export const monetizationClicksRelations = relations(monetizationClicks, ({ one }) => ({
+    link: one(monetizationLinks, {
+        fields: [monetizationClicks.linkId],
+        references: [monetizationLinks.id],
     }),
 }));
 

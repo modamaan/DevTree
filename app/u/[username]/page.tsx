@@ -13,6 +13,8 @@ import ProjectsShowcase from '@/components/profile/ProjectsShowcase';
 import ExperienceSection from '@/components/profile/ExperienceSection';
 import ResumeSection from '@/components/profile/ResumeSection';
 import ThemedProfileWrapper from '@/components/profile/ThemedProfileWrapper';
+import { MonetizationSection } from '@/components/monetization/MonetizationSection';
+import { getPublicMonetizationLinks } from '@/app/actions/monetization';
 import { getThemeById } from '@/lib/themes';
 import type { Metadata } from 'next';
 
@@ -64,6 +66,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
     const { user } = profile;
 
+    // Get monetization links
+    const monetizationResult = await getPublicMonetizationLinks(username);
+    const monetizationLinks = monetizationResult.success ? monetizationResult.links : { product: [], booking: [], affiliate: [] };
+
     // Get theme settings with fallbacks
     const themeId = profile.themeId || 'terminal';
     const theme = getThemeById(themeId);
@@ -100,6 +106,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                 )}
 
+               
                 {/* Experience */}
                 {user.experiences && user.experiences.length > 0 && (
                     <div className="mt-6 sm:mt-8">
@@ -139,6 +146,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
                         <TechStack techStack={user.techStack} />
                     </div>
                 )}
+
+                 {/* Monetization Section */}
+                {monetizationLinks && (
+                    <div className="mt-8 sm:mt-12">
+                        <MonetizationSection links={monetizationLinks} />
+                    </div>
+                )}
+
 
                 {/* Projects */}
                 {user.projects && user.projects.length > 0 && (
