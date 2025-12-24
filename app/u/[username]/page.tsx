@@ -173,30 +173,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 )}
 
                 {/* Footer */}
-                <div className={`mt-12 sm:mt-16 text-center space-y-3 ${theme.styles.textMuted} font-mono`}>
-                    {/* Legal Links */}
-                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs sm:text-sm">
-                        <Link href="/privacy" className="hover:text-green-400 transition-colors">
-                            Privacy Policy
-                        </Link>
-                        <span className="text-slate-600">•</span>
-                        <Link href="/terms" className="hover:text-green-400 transition-colors">
-                            Terms & Conditions
-                        </Link>
-                        <span className="text-slate-600">•</span>
-                        <Link href="/shipping" className="hover:text-green-400 transition-colors">
-                            Shipping Policy
-                        </Link>
-                        <span className="text-slate-600">•</span>
-                        <Link href="/refund-policy" className="hover:text-green-400 transition-colors">
-                            Refund Policy
-                        </Link>
-                        <span className="text-slate-600">•</span>
-                        <Link href="/contact" className="hover:text-green-400 transition-colors">
-                            Contact
-                        </Link>
-                    </div>
-
+                <div className={`mt-12 sm:mt-16 text-center ${theme.styles.textMuted} font-mono`}>
                     {/* Powered by DevTree */}
                     <div className="text-xs sm:text-sm">
                         <a

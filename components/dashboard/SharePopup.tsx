@@ -26,7 +26,7 @@ export default function SharePopup({ hasSeenPopup }: SharePopupProps) {
         await markSharePopupAsSeen();
     };
 
-    const shareUrl = 'https://devtree.app'; // Update with your actual domain
+    const shareUrl = 'https://devtree.site';
     const shareText = 'Check out DevTree - A developer-first Linktree alternative! 🚀';
 
     const handleCopyLink = async () => {

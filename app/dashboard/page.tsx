@@ -154,6 +154,32 @@ export default async function DashboardPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Legal & Support Links */}
+            <div className="mt-8 pt-6 border-t border-slate-700">
+                <p className="text-xs text-slate-500 mb-3">Legal & Support</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-400">
+                    <a href="/privacy" target="_blank" className="hover:text-green-400 transition-colors">
+                        Privacy Policy
+                    </a>
+                    <span className="text-slate-600">•</span>
+                    <a href="/terms" target="_blank" className="hover:text-green-400 transition-colors">
+                        Terms & Conditions
+                    </a>
+                    <span className="text-slate-600">•</span>
+                    <a href="/shipping" target="_blank" className="hover:text-green-400 transition-colors">
+                        Shipping Policy
+                    </a>
+                    <span className="text-slate-600">•</span>
+                    <a href="/refund-policy" target="_blank" className="hover:text-green-400 transition-colors">
+                        Refund Policy
+                    </a>
+                    <span className="text-slate-600">•</span>
+                    <a href="/contact" target="_blank" className="hover:text-green-400 transition-colors">
+                        Contact
+                    </a>
+                </div>
+            </div>
         </div>
     );
 }
