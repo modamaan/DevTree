@@ -51,9 +51,6 @@ export default function MobileNav({ username, navLinks }: MobileNavProps) {
                 </div>
             </div>
 
-            {/* Add padding to main content on mobile to account for fixed header */}
-            <div className="md:hidden h-14" />
-
             {/* Backdrop */}
             {isOpen && (
                 <div

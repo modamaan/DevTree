@@ -81,26 +81,26 @@ export function LinkCard({ link }: LinkCardProps) {
 
     return (
         <Card className={`bg-slate-900 border-l-4 ${getCategoryColor()}`}>
-            <CardContent className="p-4">
-                <div className="flex items-start gap-4">
+            <CardContent className="p-3 md:p-4">
+                <div className="flex flex-col sm:flex-row items-start gap-3 md:gap-4">
                     {/* Cover Image (for products) */}
                     {link.coverImage && (
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 w-full sm:w-auto">
                             <img
                                 src={link.coverImage}
                                 alt={link.title}
-                                className="w-20 h-20 object-cover rounded"
+                                className="w-full sm:w-16 md:w-20 h-32 sm:h-16 md:h-20 object-cover rounded"
                             />
                         </div>
                     )}
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">{getCategoryIcon()}</span>
-                                    <h3 className="text-lg font-semibold text-white truncate">
+                    <div className="flex-1 min-w-0 w-full">
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+                            <div className="flex-1 w-full">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-lg md:text-xl">{getCategoryIcon()}</span>
+                                    <h3 className="text-base md:text-lg font-semibold text-white truncate">
                                         {link.title}
                                     </h3>
                                     {!link.isActive && (
@@ -110,11 +110,11 @@ export function LinkCard({ link }: LinkCardProps) {
                                     )}
                                 </div>
                                 {link.description && (
-                                    <p className="text-slate-400 text-sm mt-1 line-clamp-2">
+                                    <p className="text-slate-400 text-xs md:text-sm mt-1 line-clamp-2">
                                         {link.description}
                                     </p>
                                 )}
-                                <div className="flex items-center gap-4 mt-2 text-sm">
+                                <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 text-xs md:text-sm">
                                     {link.price && (
                                         <span className="text-green-400 font-semibold">
                                             ₹{(link.price / 100).toLocaleString()}
@@ -129,14 +129,15 @@ export function LinkCard({ link }: LinkCardProps) {
                                         rel="noopener noreferrer"
                                         className="text-blue-400 hover:text-blue-300 flex items-center gap-1"
                                     >
-                                        View Link
+                                        <span className="hidden sm:inline">View Link</span>
+                                        <span className="sm:hidden">View</span>
                                         <ExternalLink className="w-3 h-3" />
                                     </a>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex sm:flex-col items-center gap-1 md:gap-2">
                                 <Button
                                     variant="ghost"
                                     size="sm"

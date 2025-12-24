@@ -20,6 +20,8 @@ interface AddLinkModalProps {
 export function AddLinkModal({ isOpen, onClose, category }: AddLinkModalProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string>('');
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -64,6 +66,61 @@ export function AddLinkModal({ isOpen, onClose, category }: AddLinkModalProps) {
     };
 
     const info = getCategoryInfo();
+
+    // Handle file upload and convert to base64
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            toast.error('Please upload a valid image file (JPG, PNG, WEBP, or GIF)');
+            return;
+        }
+
+        // Validate file size (2MB max)
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        if (file.size > maxSize) {
+            toast.error('Image size must be less than 2MB');
+            return;
+        }
+
+        setIsUploading(true);
+
+        try {
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setFormData({ ...formData, coverImage: base64String });
+                setImagePreview(base64String);
+                setIsUploading(false);
+                toast.success('Image uploaded successfully!');
+            };
+            reader.onerror = () => {
+                toast.error('Failed to read image file');
+                setIsUploading(false);
+            };
+            reader.readAsDataURL(file);
+        } catch (error) {
+            toast.error('Failed to upload image');
+            setIsUploading(false);
+        }
+    };
+
+    // Handle URL input for cover image
+    const handleCoverImageUrlChange = (url: string) => {
+        setFormData({ ...formData, coverImage: url });
+        setImagePreview(url);
+    };
+
+    // Remove cover image
+    const handleRemoveImage = () => {
+        setFormData({ ...formData, coverImage: '' });
+        setImagePreview('');
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -169,18 +226,88 @@ export function AddLinkModal({ isOpen, onClose, category }: AddLinkModalProps) {
 
                     {/* Cover Image (for products) */}
                     {category === 'product' && (
-                        <div>
-                            <Label htmlFor="coverImage" className="text-slate-300">
-                                Cover Image URL (optional)
+                        <div className="space-y-3">
+                            <Label className="text-slate-300">
+                                Cover Image (optional)
                             </Label>
-                            <Input
-                                id="coverImage"
-                                type="url"
-                                value={formData.coverImage}
-                                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                                placeholder="https://example.com/image.jpg"
-                                className="bg-slate-800 border-slate-700 text-white"
-                            />
+
+                            {/* Image Preview */}
+                            {imagePreview && (
+                                <div className="relative">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Cover preview"
+                                        className="w-full h-48 object-cover rounded-lg border border-slate-700"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleRemoveImage}
+                                        className="absolute top-2 right-2 bg-red-900/80 border-red-700 text-red-300 hover:bg-red-800"
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Upload Options */}
+                            {!imagePreview && (
+                                <div className="space-y-3">
+                                    {/* File Upload Button */}
+                                    <div>
+                                        <input
+                                            type="file"
+                                            id="coverImageFile"
+                                            accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            disabled={isUploading}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => document.getElementById('coverImageFile')?.click()}
+                                            disabled={isUploading}
+                                            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                                        >
+                                            {isUploading ? (
+                                                <>
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                    Uploading...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    📁 Upload from Computer
+                                                </>
+                                            )}
+                                        </Button>
+                                        <p className="text-xs text-slate-500 mt-1">
+                                            JPG, PNG, WEBP, or GIF (max 2MB)
+                                        </p>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="relative">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-slate-700"></div>
+                                        </div>
+                                        <div className="relative flex justify-center text-xs">
+                                            <span className="px-2 bg-slate-900 text-slate-500">or use URL</span>
+                                        </div>
+                                    </div>
+
+                                    {/* URL Input */}
+                                    <Input
+                                        id="coverImageUrl"
+                                        type="url"
+                                        value={formData.coverImage.startsWith('data:') ? '' : formData.coverImage}
+                                        onChange={(e) => handleCoverImageUrlChange(e.target.value)}
+                                        placeholder="https://example.com/image.jpg"
+                                        className="bg-slate-800 border-slate-700 text-white"
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
 

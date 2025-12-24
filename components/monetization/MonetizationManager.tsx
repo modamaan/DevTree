@@ -45,11 +45,11 @@ export function MonetizationManager({ initialLinks, totalClicks, stats }: Moneti
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-white font-mono">💰 Earn Money</h1>
-                <p className="text-slate-400 mt-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-white font-mono">💰 Earn Money</h1>
+                <p className="text-slate-400 mt-2 text-sm md:text-base">
                     Monetize your skills by adding links to your products, booking page, and affiliate programs
                 </p>
             </div>
@@ -86,30 +86,34 @@ export function MonetizationManager({ initialLinks, totalClicks, stats }: Moneti
 
             {/* Tabs for Categories */}
             <Tabs defaultValue="product" className="w-full">
-                <TabsList className="bg-slate-800 border-slate-700">
-                    <TabsTrigger value="product" className="data-[state=active]:bg-green-600">
-                        📦 Digital Products ({initialLinks.product.length})
+                <TabsList className="bg-slate-800 border-slate-700 grid grid-cols-3 w-full">
+                    <TabsTrigger value="product" className="data-[state=active]:bg-green-600 text-xs md:text-sm">
+                        <span className="hidden md:inline">📦 Digital Products ({initialLinks.product.length})</span>
+                        <span className="md:hidden">📦 ({initialLinks.product.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="booking" className="data-[state=active]:bg-blue-600">
-                        📞 1-on-1 Calls ({initialLinks.booking.length})
+                    <TabsTrigger value="booking" className="data-[state=active]:bg-blue-600 text-xs md:text-sm">
+                        <span className="hidden md:inline">📞 1-on-1 Calls ({initialLinks.booking.length})</span>
+                        <span className="md:hidden">📞 ({initialLinks.booking.length})</span>
                     </TabsTrigger>
-                    <TabsTrigger value="affiliate" className="data-[state=active]:bg-purple-600">
-                        🔗 Affiliates ({initialLinks.affiliate.length})
+                    <TabsTrigger value="affiliate" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">
+                        <span className="hidden md:inline">🔗 Affiliates ({initialLinks.affiliate.length})</span>
+                        <span className="md:hidden">🔗 ({initialLinks.affiliate.length})</span>
                     </TabsTrigger>
                 </TabsList>
 
                 {/* Digital Products Tab */}
                 <TabsContent value="product" className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <p className="text-slate-400">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                        <p className="text-slate-400 text-sm md:text-base">
                             Add links to your Gumroad products, courses, or any digital products you sell
                         </p>
                         <Button
                             onClick={() => handleAddClick('product')}
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-green-600 hover:bg-green-700 w-full md:w-auto shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Product
+                            <span className="hidden sm:inline">Add Product</span>
+                            <span className="sm:hidden">Add</span>
                         </Button>
                     </div>
 
@@ -138,16 +142,17 @@ export function MonetizationManager({ initialLinks, totalClicks, stats }: Moneti
 
                 {/* Booking Tab */}
                 <TabsContent value="booking" className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <p className="text-slate-400">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                        <p className="text-slate-400 text-sm md:text-base">
                             Add links to your Topmate, Cal.com, or Calendly booking page
                         </p>
                         <Button
                             onClick={() => handleAddClick('booking')}
-                            className="bg-blue-600 hover:bg-blue-700"
+                            className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Booking Link
+                            <span className="hidden sm:inline">Add Booking Link</span>
+                            <span className="sm:hidden">Add</span>
                         </Button>
                     </div>
 
@@ -176,16 +181,17 @@ export function MonetizationManager({ initialLinks, totalClicks, stats }: Moneti
 
                 {/* Affiliate Tab */}
                 <TabsContent value="affiliate" className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <p className="text-slate-400">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                        <p className="text-slate-400 text-sm md:text-base">
                             Add affiliate links to tools and services you recommend
                         </p>
                         <Button
                             onClick={() => handleAddClick('affiliate')}
-                            className="bg-purple-600 hover:bg-purple-700"
+                            className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Affiliate Link
+                            <span className="hidden sm:inline">Add Affiliate Link</span>
+                            <span className="sm:hidden">Add</span>
                         </Button>
                     </div>
 

@@ -106,7 +106,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                 )}
 
-               
+
                 {/* Experience */}
                 {user.experiences && user.experiences.length > 0 && (
                     <div className="mt-6 sm:mt-8">
@@ -147,7 +147,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                     </div>
                 )}
 
-                 {/* Monetization Section */}
+                {/* Monetization Section */}
                 {monetizationLinks && (
                     <div className="mt-8 sm:mt-12">
                         <MonetizationSection links={monetizationLinks} />
